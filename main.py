@@ -103,6 +103,11 @@ def one_hot(Y):
 
 
 def back_prop(Z1,A1,Z2, A2,W2,X,Y):
+    """
+        Read the read.md file or the documentation or the youtube vide for the maths behind this.
+        From the output layer to the hidden layer and then to the input layer,
+        we calculate the gradients of the loss function with respect to the weights and biases.
+    """
     try:
         
         m= Y.size()
@@ -126,6 +131,13 @@ def back_prop(Z1,A1,Z2, A2,W2,X,Y):
 
 
 def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate=0.01):
+    """
+    Read the read.md file or the documentation or the youtube vide for the maths behind this.
+    This function updates the parameters of the model using the gradients computed during backpropagation.
+    The parameters are updated using the formula:  
+    W = W - learning_rate * dW
+    b = b - learning_rate * db     
+    """
     
     try:
         W1 =  W1 - learning_rate * dW1
@@ -139,7 +151,14 @@ def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate=0.01):
         raise
 
 def get_predictions(A2):
-    
+    """
+        This function generates predictions from the output of the softmax layer.
+
+        The softmax layer produces a probability distribution across all classes.
+        The class with the highest probability is selected as the final prediction.
+
+        np.argmax(A2, 0) returns the index of the maximum probability in each column (sample).
+    """
     try:
         return np.argmax(A2, 0)
     except Exception as e:
@@ -147,7 +166,20 @@ def get_predictions(A2):
         raise
 
 
-def accuracy(predictions, Y):
+def get_accuracy(predictions, Y):
+    """
+        This function computes the accuracy of predictions made by the model.
+
+        Accuracy is calculated as:
+            (Number of Correct Predictions) / (Total Number of Samples)
+
+        Parameters:
+            predictions: A vector of predicted class labels.
+            Y: A vector of true class labels.
+
+        Returns:
+            A float value representing the accuracy (between 0 and 1).
+    """
 
     try:
         print("Predictions:", predictions)
@@ -155,11 +187,27 @@ def accuracy(predictions, Y):
 
         return np.sum(predictions == Y) / Y.size
     except Exception as e:
-        print("Error in accuracy:", e)
+        print("Error in get_accuracy:", e)
         raise
 
 def gradient_descent(X,Y, iteration,learning_rate=0.01):
+    """
+        This function performs gradient descent to train the neural network.
 
+        Steps involved:
+        1. Initialize weights and biases.
+        2. Loop over the number of iterations:
+            a. Perform forward propagation to get predictions.
+            b. Compute gradients via backpropagation.
+            c. Update parameters using the gradients and learning rate.
+        3. Optionally print accuracy every 10 iterations to monitor performance.
+
+        Parameters:
+            X: Input features (shape: 784 x m).
+            Y: True labels.
+            iteration: Number of iterations to train the model.
+            learning_rate: Learning rate used in parameter updates.
+    """
     try:
         W1, b1, W2, b2 = init_params()
 
