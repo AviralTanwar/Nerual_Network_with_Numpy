@@ -114,12 +114,28 @@ def back_prop(Z1,A1,Z2, A2,W2,X,Y):
         db2 = 1/m * np.sum(dZ2, 2)
         
         dZ1 = W2.T.dot(dZ2)*ReLu(Z1)
+
         dW1 = 1/m * np.dot(dZ1, X.T)
         db1 = 1/m * np.sum(dZ1, 2)
 
         return dW1, db1, dW2, db2
     except Exception as e:
         print("Error in back_prop:", e)
+        raise
+
+
+
+def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate=0.01):
+    
+    try:
+        W1 =  W1 - learning_rate * dW1
+        b1 =  b1 - learning_rate * db1
+        W2 =  W2 - learning_rate * dW2 
+        b2 =  b2 - learning_rate * db2
+
+        return W1, b1, W2, b2
+    except Exception as e:
+        print("Error in update_params:", e)
         raise
 
 
