@@ -139,6 +139,23 @@ def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate=0.01):
         raise
 
 
+def gradient_descent(X,Y, iteration,learning_rate=0.01):
+
+    try:
+        W1, b1, W2, b2 = init_params()
+
+        for i in range(iteration):
+            Z1, A1, Z2, A2 = forward_prop(W1, W2, b1,b2,X)
+            dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W2, X,Y)
+            W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate, learning_rate)
+
+            if i % 10 == 0:
+                print("Iteration:", i)
+                print("Acc")
+
+    except Exception as e:
+        print("Error in gradient_descent:", e)
+        raise
 
 # Reading the CSV file into a pandas DataFrame
 # The 'r' before the string makes it a raw string, which handles the backslashes in the file path
