@@ -138,6 +138,25 @@ def update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate=0.01):
         print("Error in update_params:", e)
         raise
 
+def get_predictions(A2):
+    
+    try:
+        return np.argmax(A2, 0)
+    except Exception as e:
+        print("Error in get_predictions:", e)
+        raise
+
+
+def accuracy(predictions, Y):
+
+    try:
+        print("Predictions:", predictions)
+        print("Y:", Y)
+
+        return np.sum(predictions == Y) / Y.size
+    except Exception as e:
+        print("Error in accuracy:", e)
+        raise
 
 def gradient_descent(X,Y, iteration,learning_rate=0.01):
 
@@ -151,7 +170,7 @@ def gradient_descent(X,Y, iteration,learning_rate=0.01):
 
             if i % 10 == 0:
                 print("Iteration:", i)
-                print("Acc")
+                print("Accuracy:- ", get_accuracy(get_predictions(A2)))
 
     except Exception as e:
         print("Error in gradient_descent:", e)
