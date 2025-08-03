@@ -7,6 +7,7 @@ import pandas as pd
 # Importing pyplot from matplotlib for data visualization
 from matplotlib import pyplot as plt
 
+# ---------------------------------------------------------------------------------------------------------------
 def init_params():
     """ 
     Here we have initialized the parameters for our model.
@@ -79,6 +80,46 @@ def forward_prop(W1, W2, b1,b2, X):
         return Z1, A1, Z2, A2
     except Exception as e:
         print("Error in forward_prop:", e)
+        raise
+
+def one_hot(Y):
+    """
+    One-hot encoding function.
+    Converts a vector of class labels into a one-hot encoded 2D array.
+
+    The steps are:
+    1. Create a zero matrix of shape (number of samples, number of classes)
+    2. For each sample, set the column corresponding to the class label to 1
+    """
+    try:
+        one_hot_Y = np.zeros((Y.size, Y.max() + 1))
+        one_hot_Y[np.arange(Y.size), Y] = 1
+        one_hot_Y = one_hot_Y.T 
+
+        return one_hot_Y
+    except Exception as e:
+        print("Error in one_hot:", e)
+        raise
+
+
+def back_prop(Z1,A1,Z2, A2,W2,X,Y):
+    try:
+        
+        m= Y.size()
+
+        one_hot_Y = one_hot(Y)
+        dZ2 = A2 - one_hot_Y
+        
+        dW2 = 1/m *np.dot(dZ2, A1.T)
+        db2 = 1/m * np.sum(dZ2, 2)
+        
+        dZ1 = W2.T.dot(dZ2)*ReLu(Z1)
+        dW1 = 1/m * np.dot(dZ1, X.T)
+        db1 = 1/m * np.sum(dZ1, 2)
+
+        return dW1, db1, dW2, db2
+    except Exception as e:
+        print("Error in back_prop:", e)
         raise
 
 
