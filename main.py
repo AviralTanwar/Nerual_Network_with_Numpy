@@ -43,10 +43,13 @@ def ReLu(Z):
     This is a common activation function used in neural networks.
     """
     try:
-        return Z > 0
+        return np.maximum(0, Z)
     except Exception as e:
         print("Error in ReLu:", e)
         raise
+
+def ReLu_derivative(Z):
+    return Z > 0
 
 def softmax(Z):
     """
@@ -134,7 +137,10 @@ def back_prop(Z1,A1,Z2, A2,W2,X,Y, m):
         db2 = 1/m * np.sum(dZ2, axis=1, keepdims=True)
 
         
-        dZ1 = np.dot(W2.T, dZ2)*(Z1)
+        # dZ1 = np.dot(W2.T, dZ2)*(Z1)
+
+        # You're multiplying with Z1, not the derivative of ReLU.
+        dZ1 = np.dot(W2.T, dZ2) * ReLu_derivative(Z1)
 
         dW1 = 1/m * np.dot(dZ1, X.T)
         db1 = 1/m * np.sum(dZ1, axis=1, keepdims=True)
@@ -281,23 +287,33 @@ np.random.shuffle(data) # Shuffle before splitting into dev and training sets
 data_dev = data[0:1000].T
 Y_dev = data_dev[0]
 X_dev = data_dev[1:n]
-# X_dev = X_dev / 255.
+
 
 data_train = data[1000:].T
 Y_train = data_train[0]
 X_train = data_train[1:n]
-# X_train = X_train / 255.
+
+# Nomralizing the data so that the following things doesn't happen:
+# 1. OVERFITTING
+# 2.  training collapse or exploding/vanishing gradients
+
+X_dev = X_dev / 255.
+X_train = X_train / 255.
+
 # _,m_train = X_train.shape
 
 
 Y_train
 print("Y_train:", Y_train)
 
+m_ans= X_train.shape[1]
 
 # TRAINING THE MODEL
 # Accuracy was 0.111 which was howing the over fitting and hence changing the learning rate to 0.1
 # W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, m, 0.01)
-W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, m, 0.1)
+W1,b1,W2,b2 = gradient_descent(X_train, Y_train,100,m_ans , 0.1)
+
+
 print("FINAL VA:UES OF THE WIEGHTS AND BIASES")
 print("W1:", W1)
 print("b1:", b1)
