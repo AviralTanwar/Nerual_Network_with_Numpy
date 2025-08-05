@@ -15,6 +15,8 @@ def init_params():
     W2 and b2 are the weights and biases for the second layer.
 
     We have use random with randn to have the values from -0.5 to +0.5.
+
+    Note -> We Use rand if we want the values between 0,1
     
     Also the dimensions of the layers are as follows:
         Input layer: 784 features (pixels)
@@ -273,6 +275,3 @@ X_train = data_train[1:n]
 Y_train
 print("Y_train:", Y_train)
 
-
-
-# rand
