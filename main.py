@@ -239,7 +239,7 @@ def gradient_descent(X,Y, iteration,m, learning_rate=0.01):
             dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W2, X,Y,m)
             W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate)
             print("Iteration:", i)
-            if i % 10 == 0:
+            if i % 500 == 0:
                 # print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
                 print("Accuracy:- ", get_accuracy(get_predictions(A2), Y))
                 # print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
@@ -249,6 +249,41 @@ def gradient_descent(X,Y, iteration,m, learning_rate=0.01):
     except Exception as e:
         print("Error in gradient_descent:", e)
         raise
+
+def make_predictions(X, W1, b1, W2, b2):
+    """
+    This function makes predictions using the trained model.
+    It performs forward propagation and returns the predicted class labels.
+    """
+    try:
+        _, _, _, A2 = forward_prop(W1, W2, b1, b2, X)
+        return get_predictions(A2)
+    except Exception as e:
+        print("Error in make_predictions:", e)
+        raise
+
+def test_predictions(index, W1,b1,W2,b2,X_train, Y_train):
+
+    try:
+        current_image = X_train[:, index, None]
+
+        predictions = make_predictions(X_train[:, index, None], W1, b1, W2, b2)
+        label = Y_train[index]
+
+        print(f"Predicted: {predictions}") 
+        print(f"Actual: {label}")
+
+        current_image = current_image.reshape(28, 28)*255  # Reshape to 28x28 for visualization
+        plt.gray()
+        plt.imshow(current_image, interpolation='nearest')
+        plt.show()
+
+
+    except Exception as e:
+        print("Error in test_predictions:", e)
+        raise
+
+
 
 # Reading the CSV file into a pandas DataFrame
 # The 'r' before the string makes it a raw string, which handles the backslashes in the file path
@@ -311,7 +346,7 @@ m_ans= X_train.shape[1]
 # TRAINING THE MODEL
 # Accuracy was 0.111 which was howing the over fitting and hence changing the learning rate to 0.1
 # W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, m, 0.01)
-W1,b1,W2,b2 = gradient_descent(X_train, Y_train,100,m_ans , 0.1)
+W1,b1,W2,b2 = gradient_descent(X_train, Y_train,2000,m_ans , 0.1)
 
 
 print("FINAL VA:UES OF THE WIEGHTS AND BIASES")
@@ -319,3 +354,19 @@ print("W1:", W1)
 print("b1:", b1)
 print("W2:", W2)
 print("b2:", b2)
+
+test_predictions(10, W1,b1,W2,b2,X_train, Y_train)
+
+test_predictions(5, W1,b1,W2,b2,X_train, Y_train)
+
+test_predictions(30, W1,b1,W2,b2,X_train, Y_train)
+
+test_predictions(106, W1,b1,W2,b2,X_train, Y_train)
+
+
+
+dev_predictions = make_predictions(X_dev, W1, b1, W2, b2)
+get_accuracy(dev_predictions, Y_dev)
+
+print("Development Set Predictions:", dev_predictions)
+print("Development Set Accuracy:", get_accuracy(dev_predictions, Y_dev))
