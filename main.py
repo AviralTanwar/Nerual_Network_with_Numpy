@@ -43,7 +43,7 @@ def ReLu(Z):
     This is a common activation function used in neural networks.
     """
     try:
-        return np.maximum(0, Z)
+        return Z > 0
     except Exception as e:
         print("Error in ReLu:", e)
         raise
@@ -55,10 +55,12 @@ def softmax(Z):
     This is typically used in the output layer of a classification model.
     ans = exp(Z) / sum(exp(Z))
 
+    Here axis and keepdims are used to ensure there is no overflow and the sum is computed correctly across the specified axis.
     here exp is e^Z
     """
     try:
-        return np.exp(Z) / np.sum(np.exp(Z))
+        expZ = np.exp(Z - np.max(Z, axis=0, keepdims=True))
+        return expZ / np.sum(expZ, axis=0, keepdims=True)
     except Exception as e:
         print("Error in softmax:", e)
         raise
@@ -79,6 +81,14 @@ def forward_prop(W1, W2, b1,b2, X):
         A1 = ReLu(Z1)
         Z2 = np.dot(W2, A1) + b2
         A2 = softmax(Z2)
+
+        # Used During Debugging and writing the code
+        # print("After Forwar Propogation:-")
+        # print("Z1:", Z1)
+        # print("A1:", A1)
+        # print("Z2:", Z2)
+        # print("A2:", A2)
+
         return Z1, A1, Z2, A2
     except Exception as e:
         print("Error in forward_prop:", e)
@@ -104,26 +114,30 @@ def one_hot(Y):
         raise
 
 
-def back_prop(Z1,A1,Z2, A2,W2,X,Y):
+def back_prop(Z1,A1,Z2, A2,W2,X,Y, m):
     """
         Read the read.md file or the documentation or the youtube vide for the maths behind this.
         From the output layer to the hidden layer and then to the input layer,
         we calculate the gradients of the loss function with respect to the weights and biases.
+
+            
+        Here axis and keepdims are used to ensure there is no overflow and the sum is computed correctly across the specified axis.
     """
     try:
         
-        m= Y.size()
+        # m= Y.size()
 
         one_hot_Y = one_hot(Y)
         dZ2 = A2 - one_hot_Y
         
         dW2 = 1/m *np.dot(dZ2, A1.T)
-        db2 = 1/m * np.sum(dZ2, 2)
+        db2 = 1/m * np.sum(dZ2, axis=1, keepdims=True)
+
         
-        dZ1 = W2.T.dot(dZ2)*ReLu(Z1)
+        dZ1 = np.dot(W2.T, dZ2)*(Z1)
 
         dW1 = 1/m * np.dot(dZ1, X.T)
-        db1 = 1/m * np.sum(dZ1, 2)
+        db1 = 1/m * np.sum(dZ1, axis=1, keepdims=True)
 
         return dW1, db1, dW2, db2
     except Exception as e:
@@ -192,7 +206,7 @@ def get_accuracy(predictions, Y):
         print("Error in get_accuracy:", e)
         raise
 
-def gradient_descent(X,Y, iteration,learning_rate=0.01):
+def gradient_descent(X,Y, iteration,m, learning_rate=0.01):
     """
         This function performs gradient descent to train the neural network.
 
@@ -214,13 +228,17 @@ def gradient_descent(X,Y, iteration,learning_rate=0.01):
         W1, b1, W2, b2 = init_params()
 
         for i in range(iteration):
+            print("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
             Z1, A1, Z2, A2 = forward_prop(W1, W2, b1,b2,X)
-            dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W2, X,Y)
-            W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate, learning_rate)
-
+            dW1, db1, dW2, db2 = back_prop(Z1, A1, Z2, A2, W2, X,Y,m)
+            W1, b1, W2, b2 = update_params(W1, b1, W2, b2, dW1, db1, dW2, db2, learning_rate)
+            print("Iteration:", i)
             if i % 10 == 0:
-                print("Iteration:", i)
-                print("Accuracy:- ", get_accuracy(get_predictions(A2)))
+                # print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+                print("Accuracy:- ", get_accuracy(get_predictions(A2), Y))
+                # print("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||")
+        
+        return W1, b1, W2, b2
 
     except Exception as e:
         print("Error in gradient_descent:", e)
@@ -265,7 +283,7 @@ Y_dev = data_dev[0]
 X_dev = data_dev[1:n]
 # X_dev = X_dev / 255.
 
-data_train = data[0:1000].T
+data_train = data[1000:].T
 Y_train = data_train[0]
 X_train = data_train[1:n]
 # X_train = X_train / 255.
@@ -275,3 +293,13 @@ X_train = data_train[1:n]
 Y_train
 print("Y_train:", Y_train)
 
+
+# TRAINING THE MODEL
+# Accuracy was 0.111 which was howing the over fitting and hence changing the learning rate to 0.1
+# W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, m, 0.01)
+W1,b1,W2,b2 = gradient_descent(X_train, Y_train, 100, m, 0.1)
+print("FINAL VA:UES OF THE WIEGHTS AND BIASES")
+print("W1:", W1)
+print("b1:", b1)
+print("W2:", W2)
+print("b2:", b2)
